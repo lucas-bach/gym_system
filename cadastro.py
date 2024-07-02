@@ -48,9 +48,18 @@ def query_by_name(name: str) -> CreatePeople:
     results = cursor.fetchone()
     conn.close()
 
-    if results:       
-
-
+    if results:    
         return CreatePeople(name=results[1], fk_addres=str(results[2]), fk_graduation=str(results[3]), birth_date=results[4], email=results[5], phone=str(results[6]), cpf=str(results[7]), is_student=results[8], is_teacher=results[9])
     else:
         return "Nenhum cadastro"
+    
+
+def change_registration(id: int, pessoa : CreatePeople):
+    conn = sqlite3.connect("package.db")
+    agora = datetime.now().strftime('%Y-%m-%d %H:%M')
+    cursor = conn.cursor()
+    query = "UPDATE people SET name = ?, fk_addres = ?, fk_graduation = ?, birth_date = ?, email = ?, phone = ?, cpf = ?, is_student = ?, is_teacher = ? WHERE id = ?; "    
+    cursor.execute(query, (pessoa.name,pessoa.fk_addres,pessoa.fk_graduation,pessoa.birth_date,pessoa.email,pessoa.phone,pessoa.cpf,pessoa.is_student,pessoa.is_teacher, id ))
+    conn.commit()
+    conn.close()
+
