@@ -4,24 +4,36 @@ from typing import Optional
 
 class CreatePeople(BaseModel):
     name: str
-    addres: str
-    graduation: str
+    fk_addres: str
+    fk_graduation: str
     birth_date: str
     email: str
-    phone: str
-    sexo: Optional[str]
-    state: str
-    namestate: str
-    city: str
+    phone: str    
+    cpf: str
+    is_student: str
+    is_teacher: str
+    
 
 class UpdatePeople(BaseModel):
     name: Optional[str] = None
-    addres: Optional[str] = None
-    graduation:Optional[str] = None
+    fk_addres: Optional[str] = None
+    fk_graduation:Optional[str] = None
     birth_date:Optional[str] = None
     email: Optional[str] = None
-    phone:Optional[str] = None
-    sexo: Optional[str] = None
+    phone:Optional[str] = None   
+    cpf: Optional[str] = None
+    is_student:Optional[str] = None
+    is_teacher:Optional[str] = None
+   
+
+class CreateAddres(BaseModel):
+    state: str
+    city: str
+    street: str
+    
+
+class UpdateAddres(BaseModel):
     state: Optional[str] = None
-    namestate:Optional[str] = None
-    city:Optional[str] = None
+    city: Optional[str] = None
+    street: Optional[str] = None
+    
