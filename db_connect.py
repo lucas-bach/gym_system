@@ -30,5 +30,11 @@ cursor = conn.cursor()
 # );
 # ''')
 
+# cursor.execute(''' CREATE TABLE graduation (
+#        id INTEGER PRIMARY KEY ,
+#        name STR                               
+# );
+# ''')
+
 
 conn.commit()
