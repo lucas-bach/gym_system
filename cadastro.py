@@ -1,5 +1,5 @@
 import sqlite3
-from models import CreatePeople, UpdatePeople, CreateAddres
+from models import CreatePeople, UpdatePeople, CreateAddres, UpdateAddres
 from datetime import datetime
 
 
@@ -125,8 +125,8 @@ def insert_addres(endereco : CreateAddres):
     conn = sqlite3.connect("package.db")
     agora = datetime.now().strftime('%Y-%m-%d %H:%M')
     cursor = conn.cursor()
-    query = "INSERT INTO addresses (state,city,street,created_at,updated_at) VALUES (?,?,?,?,?);"
-    cursor.execute(query,(endereco.state,endereco.city,endereco.street,agora,agora))
+    query = "INSERT INTO addresses (state,city,street,created_at) VALUES (?,?,?,?);"
+    cursor.execute(query,(endereco.state,endereco.city,endereco.street,agora))
     conn.commit()
     conn.close()
 
@@ -143,7 +143,32 @@ def read_last_addres():
         return CreateAddres(state=last_addres[1],city=last_addres[2],street=last_addres[3])
     else:
         return "Nenhum endereço cadastrado"
+
+
+def query_addres_id(id: int) -> CreateAddres:
+    conn = sqlite3.connect("package.db")
+    cursor = conn.cursor()
+    query = "SELECT * FROM addresses WHERE id = ?;"
+    cursor.execute(query, (id,))
+    results = cursor.fetchone()
+    conn.close()
+
+    if results:
+        return CreateAddres(state=results[1],city=results[2],street=results[3])
+    else:
+        return "ID não identificado"
     
+
+
+def update_addres(id:int, endereco : UpdateAddres):
+    conn = sqlite3.connect("package.db")
+    agora = datetime.now().strftime('%Y-%m-%d %H:%M')
+    cursor = conn.cursor()
+    query = "UPDATE addresses SET state = ?, city = ?, street = ?, updated_at = ? WHERE id = ?; "
+    cursor.execute(query, (endereco.state,endereco.city,endereco.street,agora,id ))
+
+    conn.commit()
+    conn.close()
 
 
 
