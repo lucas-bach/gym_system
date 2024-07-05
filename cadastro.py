@@ -23,7 +23,7 @@ def read_last_registration():
     conn.close()
 
     if last_registro:
-        return "Cadastrado com sucesso"  
+        return CreatePeople(name=last_registro[1], fk_addres=str(last_registro[2]), fk_graduation=str(last_registro[3]), birth_date=last_registro[4], email=last_registro[5], phone=str(last_registro[6]), cpf=str(last_registro[7]), is_student=last_registro[8], is_teacher=last_registro[9])  
     else:
         return "Erro ao cadastrar"   
 
@@ -46,7 +46,7 @@ def change_registration(id: int, pessoa : CreatePeople):
     conn = sqlite3.connect("package.db")
     agora = datetime.now().strftime('%Y-%m-%d %H:%M')
     cursor = conn.cursor()
-    query = "UPDATE people SET name = ?, fk_addres = ?, fk_graduation = ?, birth_date = ?, email = ?, phone = ?, cpf = ?, is_student = ?, is_teacher = ?,update_at = ? WHERE id = ?; "    
+    query = "UPDATE people SET name = ?, fk_addres = ?, fk_graduation = ?, birth_date = ?, email = ?, phone = ?, cpf = ?, is_student = ?, is_teacher = ?,updated_at = ? WHERE id = ?; "    
     cursor.execute(query, (pessoa.name,pessoa.fk_addres,pessoa.fk_graduation,pessoa.birth_date,pessoa.email,pessoa.phone,pessoa.cpf,pessoa.is_student,pessoa.is_teacher,agora, id ))
 
     conn.commit()
@@ -81,11 +81,7 @@ def partially_registration(id: int, pessoa : UpdatePeople):
 
     if pessoa.phone is not None:
         filters.append(f"phone= ?")
-        variables.append(pessoa.phone)
-
-    if pessoa.name is not None:
-        filters.append(f"name= ?")
-        variables.append(pessoa.name)            
+        variables.append(pessoa.phone)            
 
     if pessoa.cpf is not None:
         filters.append(f"cpf= ?")
@@ -101,7 +97,7 @@ def partially_registration(id: int, pessoa : UpdatePeople):
 
     
     agora = datetime.now().strftime('%Y-%m-%d %H:%M')
-    filters.append("update_at = ?")
+    filters.append("updated_at = ?")
     variables.append(agora) 
 
     variables.append(id)
@@ -115,6 +111,16 @@ def partially_registration(id: int, pessoa : UpdatePeople):
     conn.close()             
 
 
+def delete_registration(id):
+    conn = sqlite3.connect("package.db")
+    cursor = conn.cursor()
+    query = "DELETE FROM people WHERE id = ?;"
+    cursor.execute(query, (id,))
+    
+    conn.commit()
+    conn.close()
+
+
 def insert_addres(endereco : CreateAddres):
     conn = sqlite3.connect("package.db")
     agora = datetime.now().strftime('%Y-%m-%d %H:%M')
@@ -123,3 +129,22 @@ def insert_addres(endereco : CreateAddres):
     cursor.execute(query,(endereco.state,endereco.city,endereco.street,agora,agora))
     conn.commit()
     conn.close()
+
+
+def read_last_addres():
+    conn = sqlite3.connect("package.db")
+    cursor = conn.cursor()
+    query = "SELECT * FROM addresses ORDER BY ROWID DESC LIMIT 1;"
+    cursor.execute(query)
+    last_addres = cursor.fetchone()
+    conn.close()
+
+    if last_addres:
+        return CreateAddres(state=last_addres[1],city=last_addres[2],street=last_addres[3])
+    else:
+        return "Nenhum endereço cadastrado"
+    
+
+
+
+# id,state,city,street,created_at,updated_at
