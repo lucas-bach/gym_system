@@ -37,3 +37,13 @@ class UpdateAddres(BaseModel):
     city: Optional[str] = None
     street: Optional[str] = None
     
+
+class CreateGraduation(BaseModel):
+    color: str
+    degree: str
+
+
+class UpdateGraduation(BaseModel):
+    color: Optional [str] = None
+    degree: Optional [str] = None
+ 
