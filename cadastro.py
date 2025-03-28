@@ -1,5 +1,6 @@
 import sqlite3
-from models import CreatePeople, UpdatePeople, CreateAddres, UpdateAddres
+from typing import List
+from models import CreatePeople, UpdatePeople, CreateAddres, UpdateAddres, CreateGraduation, UpdateGraduation
 from datetime import datetime
 
 
@@ -160,7 +161,7 @@ def query_addres_id(id: int) -> CreateAddres:
     
 
 
-def update_addres(id:int, endereco : UpdateAddres):
+def update_addres(id:int, endereco : CreateAddres):
     conn = sqlite3.connect("package.db")
     agora = datetime.now().strftime('%Y-%m-%d %H:%M')
     cursor = conn.cursor()
@@ -171,5 +172,141 @@ def update_addres(id:int, endereco : UpdateAddres):
     conn.close()
 
 
+def part_addres(id:int, endereco : UpdateAddres):
+    conn = sqlite3.connect("package.db")
+    cursor = conn.cursor()
+    filters = []
+    variables = []
 
-# id,state,city,street,created_at,updated_at
+    if endereco.state is not None:
+        filters.append(f"state= ?")
+        variables.append(endereco.state)
+
+    if endereco.city is not None:
+        filters.append(f"city= ?")    
+        variables.append(endereco.city)
+
+    if endereco.street is not None:
+        filters.append(f"street= ?")
+        variables.append(endereco.street)
+
+
+    agora = datetime.now().strftime('%Y-%m-%d %H:%M')
+    filters.append("updated_at = ?")
+    variables.append(agora)
+
+    variables.append(id)
+
+    filters_set = ",".join(filters)
+
+    query = f"UPDATE addresses SET {filters_set} WHERE id = ?;"
+    cursor.execute(query,variables)
+
+    conn.commit()
+    conn.close()
+
+
+
+def delete_addres(id):
+    conn = sqlite3.connect("package.db")
+    cursor = conn.cursor()
+    query = "DELETE FROM addresses WHERE id = ?;"
+    cursor.execute(query, (id,))
+
+    conn.commit()
+    conn.close()
+          
+
+
+def insert_graduation(grad : CreateGraduation):
+    conn = sqlite3.connect("package.db")
+    agora = datetime.now().strftime('%Y-%m-%d %H:%M')
+    cursor = conn.cursor() 
+    query = "INSERT INTO graduation (color,degree) VALUES (?,?);"
+    cursor.execute(query,(grad.color,grad.degree))
+    conn.commit()
+    conn.close()
+
+
+def read_last_graduation():
+    conn = sqlite3.connect("package.db")
+    cursor = conn.cursor()
+    query = "SELECT * FROM graduation ORDER BY ROWID DESC LIMIT 1;"
+    cursor.execute(query)
+    last_registro = cursor.fetchone()
+    conn.close()
+
+    if last_registro:
+        return CreateGraduation(color=last_registro[1],degree=str(last_registro[2]))
+    else:
+        return "Erro ao cadastrar"
+
+
+
+def query_by_color(color: str) -> List[CreateGraduation]:
+    conn = sqlite3.connect("package.db")
+    cursor = conn.cursor()
+    query = "SELECT * FROM graduation WHERE color = ?;"
+    cursor.execute(query, (color,))
+    results = cursor.fetchall()
+
+    graduations = []
+    for result in results:
+     graduations.append(CreateGraduation(color=result[1], degree=str(result[2])))
+
+    conn.close()
+
+    return graduations if graduations else ["Nenhum Cadastro"]
+
+
+    
+def change_graduation(id: int, grad : CreateGraduation):
+    conn = sqlite3.connect("package.db")    
+    agora = datetime.now().strftime('%Y-%m-%d %H:%M')
+    cursor = conn.cursor()
+    query = " UPDATE graduation SET color = ?, degree = ?, updated_at = ? WHERE id = ?;"
+    cursor.execute(query, (grad.color,grad.degree,agora,id))
+    
+    conn.commit()
+    conn.close()
+
+
+def part_graduation(id: int, grad : UpdateGraduation):
+    conn = sqlite3.connect("package.db")
+    cursor = conn.cursor()
+    filters = []
+    variables = []
+
+    if grad.color is not None:
+        filters.append(f"color= ?")
+        variables.append(grad.color)
+
+    if grad.degree is not None:
+        filters.append(f"degree= ?")
+        variables.append(grad.degree)
+
+    agora = datetime.now().strftime('%Y-%m-%d %H:%M')
+    filters.append("updated_at = ?")
+    variables.append(agora)
+
+    variables.append(id)
+
+    filters_set = "," .join(filters)
+
+    query = f"UPDATE graduation SET {filters_set} WHERE id = ?;"
+    cursor.execute(query,variables)
+
+    conn.commit()
+    conn.close()
+
+
+def delete_graduation(id):
+    conn = sqlite3.connect("package.db")
+    cursor = conn.cursor()
+    query = "DELETE FROM graduation WHERE id = ?;"
+    cursor.execute(query, (id,)) 
+
+    conn.commit()
+    conn.close()
+
+
